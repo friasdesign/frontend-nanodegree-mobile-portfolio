@@ -62,5 +62,5 @@ The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstra
 #### Loading Time
 
 1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. **280ms** to `load` with analytics inside `perfmatters.js`, **335ms** to `load` with analytics *inline*.
-
+2. Shortening CSS selectors and removing unused/redundant styles from `style.css` made parse stylesheet time change from `2.25ms` to ~`3ms`, interesting because overall onload time has been down to ~800ms from 1600ms. This could be due to a decreased recalculate style time.
 
