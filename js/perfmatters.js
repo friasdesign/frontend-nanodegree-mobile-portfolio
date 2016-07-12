@@ -9,6 +9,14 @@ function logCRP() {
   stats.textContent = 'DCL: ' + dcl + 'ms, onload: ' + complete + 'ms';
 }
 
-window.addEventListener("load", function(event) {
+window.addEventListener("load", function analize(event) {
   logCRP();
+
+  // Placing Google Analytics code inside 
+	(function analytics(w,g){w['GoogleAnalyticsObject']=g;
+	w[g]=w[g]||function(){(w[g].q=w[g].q||[]).push(arguments)};w[g].l=1*new Date();})(window,'ga');
+
+	// Optional TODO: replace with your Google Analytics profile ID.
+	ga('create', 'UA-XXXX-Y');
+	ga('send', 'pageview');
 });

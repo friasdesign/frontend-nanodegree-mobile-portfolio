@@ -53,3 +53,14 @@ The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstra
 
 * <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
 * <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+
+
+## Optimization
+
+### `index.html`
+
+#### Loading Time
+
+1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. **280ms** to `load` with analytics inside `perfmatters.js`, **335ms** to `load` with analytics *inline*.
+
+
