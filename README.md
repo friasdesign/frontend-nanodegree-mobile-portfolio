@@ -77,9 +77,9 @@ This generator created DOM elements with randomly named pizzas, the fact that th
 
 | __Marks__ | __Vanilla__ | __Optimization__ |
 | --------- | ----------- | ---------------- |
-| 1st       |       136ms |             82ms |
-| 2nd       |       175ms |             69ms |
-| 3rd       |       173ms |             57ms |
-| 4th       |       161ms |             61ms |
-| 5th       |       150ms |             71ms |
-| _Average_ |     _159ms_ |           _71ms_ |
+| 1st       |        80ms |             68ms |
+| 2nd       |        97ms |             73ms |
+| 3rd       |       138ms |             81ms |
+| 4th       |        77ms |             52ms |
+| 5th       |        81ms |             63ms |
+| _Average_ |      _94ms_ |           _67ms_ |
