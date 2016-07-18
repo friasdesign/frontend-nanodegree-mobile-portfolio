@@ -358,6 +358,11 @@ var makeRandomPizza = function() {
   return pizza;
 };
 
+// OPTIMIZATION: I passed all default styles to pizza that are added here in JS
+// as CSS properties for the corresponding CSS rule (as for .pizzaContainer { width: x }).
+// This style will be overriden when changed for inline style when Pizza sizes 
+// are modified programatically.
+
 // returns a DOM element for each pizza
 var pizzaElementGenerator = function(i) {
   var pizzaContainer,             // contains pizza title, image and list of ingredients
@@ -373,18 +378,15 @@ var pizzaElementGenerator = function(i) {
   pizzaDescriptionContainer = document.createElement("div");
 
   pizzaContainer.classList.add("randomPizzaContainer");
-  pizzaContainer.style.width = "33.33%";
-  pizzaContainer.style.height = "325px";
   pizzaContainer.id = "pizza" + i;                // gives each pizza element a unique id
-  pizzaImageContainer.style.width="35%";
 
   pizzaImage.src = "images/pizza.png";
   pizzaImage.classList.add("img-responsive");
+  pizzaImageContainer.classList.add("randomPizzaContainer__image");
   pizzaImageContainer.appendChild(pizzaImage);
   pizzaContainer.appendChild(pizzaImageContainer);
 
-
-  pizzaDescriptionContainer.style.width="65%";
+  pizzaDescriptionContainer.classList.add('desc');
 
   pizzaName = document.createElement("h4");
   pizzaName.innerHTML = randomName();
@@ -465,19 +467,9 @@ var resizePizzas = function(size) {
   console.log("Time to resize pizzas: " + timeToResize[timeToResize.length-1].duration + "ms");
 };
 
-window.performance.mark("mark_start_generating"); // collect timing data
-
-// This for-loop actually creates and appends all of the pizzas when the page loads
-for (var i = 2; i < 100; i++) {
-  var pizzasDiv = document.getElementById("randomPizzas");
-  pizzasDiv.appendChild(pizzaElementGenerator(i));
-}
-
-// User Timing API again. These measurements tell you how long it took to generate the initial pizzas
-window.performance.mark("mark_end_generating");
-window.performance.measure("measure_pizza_generation", "mark_start_generating", "mark_end_generating");
-var timeToGenerate = window.performance.getEntriesByName("measure_pizza_generation");
-console.log("Time to generate pizzas on load: " + timeToGenerate[0].duration + "ms");
+// CODE EXECUTED BEFORE DOMContentLoaded _______________________________________
+loadBackground();
+// --> END CODE EXECUTED BEFORE DOMContentLoaded _______________________________
 
 // Iterator for number of times the pizzas in the background have scrolled.
 // Used by updatePositions() to decide when to log the average time per frame
@@ -536,3 +528,26 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   updatePositions();
 });
+
+function loadBackground() {
+  window.performance.mark("mark_start_generating"); // collect timing data
+
+  var pizzasDiv = document.getElementById("randomPizzas"),
+      pizzaQty = 100,
+      pizzasDOM = [];
+
+  // Add DOM nodes for each pizza
+  for(var i = 2; i < pizzaQty; i++) {
+
+  }
+
+  for (var i = 2; i < pizzaQty; i++) {
+    pizzasDiv.appendChild(pizzaElementGenerator(i));
+  }
+
+  // User Timing API again. These measurements tell you how long it took to generate the initial pizzas
+  window.performance.mark("mark_end_generating");
+  window.performance.measure("measure_pizza_generation", "mark_start_generating", "mark_end_generating");
+  var timeToGenerate = window.performance.getEntriesByName("measure_pizza_generation");
+  console.log("Time to generate pizzas on load: " + timeToGenerate[0].duration + "ms");
+}

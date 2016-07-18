@@ -57,10 +57,29 @@ The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstra
 
 ## Optimization
 
-### `index.html`
+### `./*.html`
+
+The following optimizations apply to these files: `index.html`, `project-2048.html`, `project-mobile.html`, and `project-webperf.html`.
 
 #### Loading Time
 
 1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. **280ms** to `load` with analytics inside `perfmatters.js`, **335ms** to `load` with analytics *inline*.
 2. Shortening CSS selectors and removing unused/redundant styles from `style.css` made parse stylesheet time change from `2.25ms` to ~`3ms`, interesting because overall onload time has been down to ~800ms from 1600ms. This could be due to a decreased recalculate style time.
 
+### `./views/`
+
+#### Loading Time
+
+The following optimizations have been applied in order to optimize loading time:
+
+##### pizzaElementGenerator (in `js/main.js`)
+This generator created DOM elements with randomly named pizzas, the fact that this function also assigned inline styles to each of the DOM nodes individually before appending made it run slowly, _optimization_ applied here was to default those styles in `style.css` instead and simply add the corresponding class to each node. Here are the results:
+
+| __Marks__ | __Vanilla__ | __Optimization__ |
+| --------- | ----------- | ---------------- |
+| 1st       |       136ms |             82ms |
+| 2nd       |       175ms |             69ms |
+| 3rd       |       173ms |             57ms |
+| 4th       |       161ms |             61ms |
+| 5th       |       150ms |             71ms |
+| _Average_ |     _159ms_ |           _71ms_ |
