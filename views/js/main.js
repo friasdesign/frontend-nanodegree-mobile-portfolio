@@ -400,35 +400,21 @@ var pizzaElementGenerator = function(i) {
   return pizzaContainer;
 };
 
-// resizePizzas(size) is called when the slider in the "Our Pizzas" section of the website moves.
-var resizePizzas = function(size) {
-  window.performance.mark("mark_start_resize");   // User Timing API function
+// PIZZA RESIZER _______________________________________________________________
+/*
+  Pizza Resizer is a singleton obj that wraps all functions neede for changing
+  pizza size, since constantly defining functions and variables each time the
+  event listener is triggered is not performant. We create a single instance of
+  this object while page is loading.
+  Defining most of these helper function on the global scope will pollute it, so
+  they get wrapped inside this singleton.
+*/
+var PizzaResizer = (function PizzaResizerInstanciator() {
+  var instance;
 
-  // Changes the value for the size of the pizza above the slider
-  function changeSliderLabel(size) {
-    switch(size) {
-      case "1":
-        document.querySelector("#pizzaSize").innerHTML = "Small";
-        return;
-      case "2":
-        document.querySelector("#pizzaSize").innerHTML = "Medium";
-        return;
-      case "3":
-        document.querySelector("#pizzaSize").innerHTML = "Large";
-        return;
-      default:
-        console.log("bug in changeSliderLabel");
-    }
-  }
-
-  changeSliderLabel(size);
-
-   // Returns the size difference to change a pizza element from one size to another. Called by changePizzaSlices(size).
-  function determineDx (elem, size) {
-    var oldWidth = elem.offsetWidth;
-    var windowWidth = document.querySelector("#randomPizzas").offsetWidth;
-    var oldSize = oldWidth / windowWidth;
-
+  function PizzaResizer() {
+    // Private props and methods
+    
     // Changes the slider value to a percent width
     function sizeSwitcher (size) {
       switch(size) {
@@ -443,33 +429,89 @@ var resizePizzas = function(size) {
       }
     }
 
-    var newSize = sizeSwitcher(size);
-    var dx = (newSize - oldSize) * windowWidth;
+    // Returns the size difference to change a pizza element from one size to another.
+      // Called by changePizzaSlices(size).
+    function determineDx(elem, size) {
+      var oldWidth = elem.offsetWidth;
+      var windowWidth = document.querySelector("#randomPizzas").offsetWidth;
+      var oldSize = oldWidth / windowWidth;
 
-    return dx;
-  }
+      var newSize = sizeSwitcher(size);
+      var dx = (newSize - oldSize) * windowWidth;
 
-  // Iterates through pizza elements on the page and changes their widths
-  function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+      return dx;
     }
+
+    return {
+      // Changes the value for the size of the pizza above the slider
+      changeSliderLabel: function(size) {
+        switch(size) {
+          case "1":
+            document.querySelector("#pizzaSize").innerHTML = "Small";
+            return;
+          case "2":
+            document.querySelector("#pizzaSize").innerHTML = "Medium";
+            return;
+          case "3":
+            document.querySelector("#pizzaSize").innerHTML = "Large";
+            return;
+          default:
+            console.log("bug in changeSliderLabel");
+        }
+      },
+      // Iterates through pizza elements on the page and changes their widths
+      changePizzaSizes: function (size) {
+        var randomContainers = document.querySelectorAll('.randomPizzaContainer');
+        for (var i = 0, max = randomContainers.length; i < max; i+=1) {
+          var dx = determineDx(randomContainers[i], size);
+          var newwidth = (randomContainers[i].offsetWidth + dx) + 'px';
+          randomContainers[i].style.width = newwidth;
+        }
+      }
+    };
   }
 
-  changePizzaSizes(size);
-
-  // User Timing API is awesome
-  window.performance.mark("mark_end_resize");
-  window.performance.measure("measure_pizza_resize", "mark_start_resize", "mark_end_resize");
-  var timeToResize = window.performance.getEntriesByName("measure_pizza_resize");
-  console.log("Time to resize pizzas: " + timeToResize[timeToResize.length-1].duration + "ms");
-};
+  return {
+    getInstance: function() {
+      if(!instance) {
+        instance = PizzaResizer();
+      }
+      return instance;
+    }
+  };
+})();
 
 // CODE EXECUTED BEFORE DOMContentLoaded _______________________________________
 loadBackground();
 // --> END CODE EXECUTED BEFORE DOMContentLoaded _______________________________
+
+// CODE EXECUTED AFTER DOM CONTENT LOADED EVENT ________________________________
+document.addEventListener('DOMContentLoaded', function loaded() {
+  var slider = document.getElementById('sizeSlider');
+
+  // Listener resizePizzas has a closure on this instance/
+  var pizzaResizer = PizzaResizer.getInstance();
+
+  // Add the listener for changing pizza sizes.
+  // resizePizzas(size) is called when the slider in the "Our Pizzas" section of the website moves.
+  slider.addEventListener('change', function resizePizzas(evt) {
+    var size = evt.target.value,
+        perfAPI = window.performance;
+
+    perfAPI.mark("mark_start_resize");   // User Timing API function
+
+    pizzaResizer.changeSliderLabel(size);
+
+    pizzaResizer.changePizzaSizes(size);
+
+    // User Timing API is awesome
+    perfAPI.mark("mark_end_resize");
+    perfAPI.measure("measure_pizza_resize", "mark_start_resize", "mark_end_resize");
+    var timeToResize = perfAPI.getEntriesByName("measure_pizza_resize");
+    console.log("Time to resize pizzas: " + timeToResize[timeToResize.length-1].duration + "ms");
+  });
+});
+// --> END CODE EXECUTED AFTER DOM CONTENT LOADED  EVENT _______________________
 
 // Iterator for number of times the pizzas in the background have scrolled.
 // Used by updatePositions() to decide when to log the average time per frame
