@@ -83,3 +83,24 @@ This generator created DOM elements with randomly named pizzas, the fact that th
 | 4th       |        77ms |             52ms |
 | 5th       |        81ms |             63ms |
 | _Average_ |      _94ms_ |           _67ms_ |
+
+#### PizzaResize
+
+The following optimizations have been applied in order to improve pizza resizing time:
+
+##### Singleton reengineering
+
+In vanilla, functions were defined inside the listener, so each time the user clicked the slider (`#sizeSlider`), JS redefined functions with the same code inside.
+In order to optimize this issue, I've used a *singleton pattern* to create an object which holds all functions used for resizing pizzas. This singleton, name `PizzaResizer`, is instanciated only once after `DOMContentLoaded` event, so those functions are available as methods inside `PizzaResizer`.
+
+The following results were obtained:
+
+| __Marks__ | __Vanilla__ | __Optimization__ |
+| --------- | ----------- | ---------------- |
+| 1st       |       378ms |            354ms |
+| 2nd       |       376ms |            312ms |
+| 3rd       |       377ms |            269ms |
+| 4th       |       340ms |            257ms |
+| 5th       |       424ms |            325ms |
+| _Average_ |     _379ms_ |          _303ms_ |
+
