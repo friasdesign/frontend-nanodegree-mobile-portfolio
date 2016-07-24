@@ -104,3 +104,25 @@ The following results were obtained:
 | 5th       |       424ms |            325ms |
 | _Average_ |     _379ms_ |          _303ms_ |
 
+
+#### Changing Classes
+The general main issue with PizzaResize is Forced Asynchronous Layout, in order to restore the *CRP* (Critical Rendering Path) sequential order I came up with the idea of adding the different sizes in classes and then simply toggling the classes as needed.
+
+The classes are:
+ - `randomPizzaContainer--small`. Sets the `width` property to *25%*.
+ - `randomPizzaContainer--large`. Sets the `width` property to *50%*.
+ - `randomPizzaContainer`. **Default**.Sets the `width` property to *33.3%*.
+
+In timeline the results show that JS code is executed first, once finished *CRP* order is followed, calling **Recalculate Styles**, then **Layout**, and **Paint**.
+
+The results are astonishing, iterating over the *Singleton optimization*, the following are the results:
+
+| __Marks__ | __Vanilla__ | __Singleton__ | __Class Optimization__ |
+| --------- | ----------- | ------------- | ---------------------- |
+| 1st       |       378ms |         354ms |                    4ms |
+| 2nd       |       376ms |         312ms |                    4ms |
+| 3rd       |       377ms |         269ms |                    4ms |
+| 4th       |       340ms |         257ms |                    6ms |
+| 5th       |       424ms |         325ms |                    4ms |
+| _Average_ |     _379ms_ |       _303ms_ |                  _4ms_ |
+
