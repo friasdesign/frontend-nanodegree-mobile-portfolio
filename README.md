@@ -126,3 +126,9 @@ The results are astonishing, iterating over the *Singleton optimization*, the fo
 | 5th       |       424ms |         325ms |                    4ms |
 | _Average_ |     _379ms_ |       _303ms_ |                  _4ms_ |
 
+### Scrolling
+
+The main issue during scrolling is the recalculation of the position of pizzas in the background, these are optimizations that took place in order to reach better performance.
+
+#### Singleton Pattern
+A singleton, named `Mover`, has been created for wrapping all methods related. **No significant improve** in performance have been seen using this pattern, but code is now **modularized** with a **cleaner global** scope.

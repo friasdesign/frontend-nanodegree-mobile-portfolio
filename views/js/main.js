@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 });
 // --> END CODE EXECUTED AFTER DOM CONTENT LOADED  EVENT _______________________
 
-
+// HELPER FUNCTIONS ____________________________________________________________
 function loadBackground() {
   window.performance.mark("mark_start_generating"); // collect timing data
 
