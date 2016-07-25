@@ -132,3 +132,22 @@ The main issue during scrolling is the recalculation of the position of pizzas i
 
 #### Singleton Pattern
 A singleton, named `Mover`, has been created for wrapping all methods related. **No significant improve** in performance have been seen using this pattern, but code is now **modularized** with a **cleaner global** scope.
+
+#### Animation Frame and Batching
+
+Analyzing the Timeline, FSL(Forced Synchronous Layout) has been seen whenever `updatePositions` method was executed. The following measures has been taken for overcoming this issue:
+1. Execute `updatePositions` method first in a frame, using `requestAnimationFrame()`. This allows JS code to reach calculated **layout** from previous frame.
+2. `document.body.scrollTop` moved to the top of the function. This forced **layout** to be recalculated each for loop iteration.
+
+This optimization shown the following results:
+
+| __Marks__ | __Vanilla__ | __Singleton__ | __Class Optimization__ |
+| --------- | ----------- | ------------- | ---------------------- |
+| 1st       |        91ms |          88ms |                    3ms |
+| 2nd       |        62ms |          60ms |                    2ms |
+| 3rd       |        62ms |          56ms |                    3ms |
+| 4th       |        60ms |          60ms |                    2ms |
+| 5th       |        60ms |          65ms |                    2ms |
+| _Average_ |      _67ms_ |        _66ms_ |                  _2ms_ |
+
+Used [this](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing#avoid-forced-synchronous-layouts) link as reference.

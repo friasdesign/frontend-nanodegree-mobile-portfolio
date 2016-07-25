@@ -515,11 +515,12 @@ var Mover = (function MoverInstanciator(){
 
       // Moves the sliding background pizzas based on scroll position
       updatePositions: function () {
+        var bodyScrollTop = document.body.scrollTop / 1250;
         frame++;
         window.performance.mark("mark_start_frame");
 
-        for (var i = 0, max = movers.length; i < max; i++) {
-          var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+        for (var i = 0, max = movers.length; i < max; i+=1) {
+          var phase = Math.sin(bodyScrollTop + (i % 5));
           movers[i].style.left = movers[i].basicLeft + 100 * phase + 'px';
         }
 
@@ -596,7 +597,9 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   });
 
   // runs updatePositions on scroll
-  window.addEventListener('scroll', pizzaMover.updatePositions);
+  window.addEventListener('scroll', function onWindowScroll() {
+    requestAnimationFrame(pizzaMover.updatePositions);
+  });
 });
 // --> END CODE EXECUTED AFTER DOM CONTENT LOADED  EVENT _______________________
 
