@@ -548,7 +548,7 @@ var Mover = (function MoverInstanciator(){
           document.querySelector("#movingPizzas1").appendChild(elem);
           movers.push(elem);
         }
-        this.updatePositions();
+        requestAnimationFrame(this.updatePositions);
       }
     };
   }
