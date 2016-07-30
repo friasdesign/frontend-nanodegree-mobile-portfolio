@@ -1,3 +1,8 @@
+/* jshint esversion: 6 */
+/* globals require */
+
+(function GulpMain() {
+
 'use strict';
 
 const gulp = require('gulp'),
@@ -8,7 +13,15 @@ const gulp = require('gulp'),
 			cleanCSS = require('gulp-clean-css'),
 			browserSync = require('browser-sync').create(),
 			imagemin = require('gulp-imagemin'),
-			pngquant = require('imagemin-pngquant');
+			pngquant = require('imagemin-pngquant'),
+			rename = require('gulp-rename'),
+			imageResize = require('gulp-image-resize'),
+			webp = require('gulp-webp');
+
+// Demilitarized Object, it's a pattern used for passing a safe object as first
+// argument for bind, apply or call methods, for preventing possible global
+// pollution. More info: //github.com/getify/You-Dont-Know-JS/blob/master/this%20%26%20object%20prototypes/ch2.md#safer-this
+const DMZ = Object.create(null);
 
 // This constant saves the path to the post-built code. You can change this
 // value to compile to another destination.
@@ -33,13 +46,13 @@ function compileSass(srcPath, destPath) {
 }
 
 gulp.task('compile-styles--base',
-	compileSass.bind(this,
+	compileSass.bind(DMZ,
 		'./' + srcPath,
 		'./' + destPath)
 );
 
 gulp.task('compile-styles--views',
-	compileSass.bind(this,
+	compileSass.bind(DMZ,
 		'./views/' + srcPath,
 		'./views/' + destPath)
 );
@@ -68,13 +81,13 @@ function minifyHTML(srcPath, destPath) {
 }
 
 gulp.task('minify-html--base',
-	minifyHTML.bind(this,
+	minifyHTML.bind(DMZ,
 		'*.html',
 		distDir + '/')
 );
 
 gulp.task('minify-html--views',
-	minifyHTML.bind(this,
+	minifyHTML.bind(DMZ,
 		'views/*.html',
 		distDir + '/views')
 );
@@ -92,13 +105,13 @@ function minifyCSS(srcPath, destPath) {
 }
 
 gulp.task('minify-css--base',
-	minifyCSS.bind(this,
+	minifyCSS.bind(DMZ,
 		'css/*.css',
 		distDir + '/css')
 );
 
 gulp.task('minify-css--views',
-	minifyCSS.bind(this,
+	minifyCSS.bind(DMZ,
 		'views/css/*.css',
 		distDir + '/views/css')
 );
@@ -117,13 +130,13 @@ function minifyJS(srcPath, destPath) {
 }
 
 gulp.task('minify-js--base',
-	minifyJS.bind(this,
+	minifyJS.bind(DMZ,
 		'js/*.js',
 		distDir + '/js')
 );
 
 gulp.task('minify-js--views',
-	minifyJS.bind(this,
+	minifyJS.bind(DMZ,
 		'./views/js/*.js',
 		distDir + '/views/js')
 );
@@ -134,6 +147,104 @@ gulp.task('minify-js', [
 ]);
 
 // MIN__IMG ____________________________________________________________________
+
+// This logic is only used once in pizzeria.jpg, although this task reusable in
+// other more complex projects.
+const breakPoints = [
+	{
+		type: 'mobile',
+		size: 720
+	},
+	{
+		type: 'desktop',
+		size: 360
+	}
+];
+var resizeImageTasks = [];
+
+function baseConversion(src, dest, size, dpi,format) {
+  format = format || "";
+  dpi = dpi || 1;
+
+  const baseDir = 'views/images/';
+  var imgResizeOpt = { width: size * dpi },
+      suffix = "";
+
+  if(format) {
+    imgResizeOpt.format = format; 
+  }
+
+  if (dpi > 1) {
+    suffix = "-" + dpi + "x";
+  }
+
+  return gulp.src(baseDir + src)
+    .pipe(imageResize(imgResizeOpt))
+    .pipe(imagemin({ progressive: true }))
+    .pipe(rename((path) => { path.basename += suffix; }))
+    .pipe(gulp.dest(baseDir + dest));
+}
+
+breakPoints.forEach(function imageResizer(breakpoint){
+	let taskName = '',
+			size = breakpoint.size,
+			// These paths are relatives to images folder, in this case views/images
+			srcPath = '.__raw/*.{jpeg,jpg,png}',
+			destPath = size;
+
+	// If the target breakpoint is desktop type, create a task to generate an x1
+	// version of the image
+	if(breakpoint.type === 'desktop') {
+		// ORIGINAL FORMAT --> x1 Pixel ratio task
+	  taskName = 'resize_' + size;
+
+	  gulp.task(taskName, () => {
+	    baseConversion(srcPath, destPath, size, 1);
+	  });
+	  resizeImageTasks.push(taskName);
+
+	  // WEBP FORMAT --> x1 Pixel ratio task
+	  taskName = 'resize_webp_' + size;
+	  gulp.task(taskName, () => {
+	    baseConversion(srcPath, destPath, size, 1, 'webp');
+	  });
+	  resizeImageTasks.push(taskName);
+	}
+
+ 	// ORIGINAL FORMAT --> x2 Pixel ratio task
+  taskName = 'resize_' + size + '_x2';
+  gulp.task(taskName, () => {
+    baseConversion(srcPath, destPath, size, 2);
+  });
+  resizeImageTasks.push(taskName);
+
+  // WEBP FORMAT --> x2 Pixel ratio task
+  taskName = 'resize_webp_' + size + '_x2';
+  gulp.task(taskName, () => {
+    baseConversion(srcPath, destPath, size, 2, 'webp');
+  });
+  resizeImageTasks.push(taskName);
+
+  // If the target breakpoint is mobile type, create a task to generate an x3
+  // version off the image
+  if(breakpoint.type === 'mobile') {
+  	// ORIGINAL FORMAT --> x2 Pixel ratio task
+	  taskName = 'resize_' + size + '_x3';
+	  gulp.task(taskName, () => {
+	    baseConversion(srcPath, destPath, size, 3);
+	  });
+	  resizeImageTasks.push(taskName);
+
+	  // WEBP FORMAT --> x2 Pixel ratio task
+	  taskName = 'resize_webp_' + size + '_x3';
+	  gulp.task(taskName, () => {
+	    baseConversion(srcPath, destPath, size, 3, 'webp');
+	  });
+	  resizeImageTasks.push(taskName);
+  }
+
+});
+
 function minIMG(srcPath, destPath) {
 	return gulp.src(srcPath)
     .pipe(imagemin({
@@ -143,17 +254,21 @@ function minIMG(srcPath, destPath) {
     }))
     .pipe(gulp.dest(destPath));
 }
-gulp.task('min-img--base', minIMG.bind(this,
+
+gulp.task('responsive-img', resizeImageTasks);
+
+gulp.task('min-img--base', minIMG.bind(DMZ,
 	'img/*',
 	distDir + '/img')
 );
 
-gulp.task('min-img--views', minIMG.bind(this,
+gulp.task('min-img--views', minIMG.bind(DMZ,
 	'views/images/*',
 	distDir + '/views/images')
 );
 
 gulp.task('min-img', [
+	'responsive-img',
 	'min-img--base',
 	'min-img--views'
 ]);
@@ -165,3 +280,5 @@ gulp.task('build', [
 	'minify-css',
 	'min-img'
 ]);
+
+})();
