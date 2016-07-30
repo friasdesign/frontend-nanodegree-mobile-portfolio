@@ -263,7 +263,7 @@ gulp.task('min-img--base', minIMG.bind(DMZ,
 );
 
 gulp.task('min-img--views', minIMG.bind(DMZ,
-	'views/images/*',
+	'views/images/*/*',
 	distDir + '/views/images')
 );
 
