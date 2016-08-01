@@ -1,8 +1,8 @@
 # Mobile Portfolio Optimization
 
-This project is part of **Udacity's Front-end Nanodegree** and is made based on [this](https://review.udacity.com/#!/rubrics/16/view) rubric.
+This project is part of __Udacity's Front-end Nanodegree__ and is made based on [this](https://review.udacity.com/#!/rubrics/16/view) rubric.
 
-This file describes the optimizations made in order to achieve **60fps** most of the time, and an acceptable loading time.
+This file describes the optimizations made in order to achieve __60fps__ most of the time, and an acceptable loading time.
 
 ## Optimization
 
@@ -12,7 +12,7 @@ The following optimizations apply to these files: `index.html`, `project-2048.ht
 
 #### Loading Time
 
-1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. **280ms** to `load` with analytics inside `perfmatters.js`, **335ms** to `load` with analytics *inline*.
+1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. __280ms__ to `load` with analytics inside `perfmatters.js`, __335ms__ to `load` with analytics *inline*.
 2. Shortening CSS selectors and removing unused/redundant styles from `style.css` made parse stylesheet time change from `2.25ms` to ~`3ms`, interesting because overall onload time has been down to ~800ms from 1600ms. This could be due to a decreased recalculate style time.
 
 ### `./views/`
@@ -60,9 +60,9 @@ The general main issue with PizzaResize is Forced Asynchronous Layout, in order 
 The classes are:
  - `randomPizzaContainer--small`. Sets the `width` property to *25%*.
  - `randomPizzaContainer--large`. Sets the `width` property to *50%*.
- - `randomPizzaContainer`. **Default**.Sets the `width` property to *33.3%*.
+ - `randomPizzaContainer`. __Default__.Sets the `width` property to *33.3%*.
 
-In timeline the results show that JS code is executed first, once finished *CRP* order is followed, calling **Recalculate Styles**, then **Layout**, and **Paint**.
+In timeline the results show that JS code is executed first, once finished *CRP* order is followed, calling __Recalculate Styles__, then __Layout__, and __Paint__.
 
 The results are astonishing, iterating over the *Singleton optimization*, the following are the results:
 
@@ -80,13 +80,13 @@ The results are astonishing, iterating over the *Singleton optimization*, the fo
 The main issue during scrolling is the recalculation of the position of pizzas in the background, these are optimizations that took place in order to reach better performance.
 
 #### Singleton Pattern
-A singleton, named `Mover`, has been created for wrapping all methods related. **No significant improve** in performance have been seen using this pattern, but code is now **modularized** with a **cleaner global** scope.
+A singleton, named `Mover`, has been created for wrapping all methods related. __No significant improve__ in performance have been seen using this pattern, but code is now __modularized__ with a __cleaner global__ scope.
 
 #### Animation Frame and Batching
 
 Analyzing the Timeline, FSL(Forced Synchronous Layout) has been seen whenever `updatePositions` method was executed. The following measures has been taken for overcoming this issue:
-1. Execute `updatePositions` method first in a frame, using `requestAnimationFrame()`. This allows JS code to reach calculated **layout** from previous frame.
-2. `document.body.scrollTop` moved to the top of the function. This forced **layout** to be recalculated each for loop iteration.
+1. Execute `updatePositions` method first in a frame, using `requestAnimationFrame()`. This allows JS code to reach calculated __layout__ from previous frame.
+2. `document.body.scrollTop` moved to the top of the function. This forced __layout__ to be recalculated each for loop iteration.
 
 This optimization shown the following results:
 
@@ -100,3 +100,56 @@ This optimization shown the following results:
 | _Average_ |      _67ms_ |        _66ms_ |                  _2ms_ |
 
 Used [this](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing#avoid-forced-synchronous-layouts) link as reference.
+
+### A single CSS file
+
+The original `bootstrap-grid.css` file containing bootstrap grid system has been transformed into a __SASS partial__ named `_grid.scss` this partial is required inside the main `style.scss` to be added when __SASS pre-compiler__ runs, this way CRP Number of critical resources is shortened to 3 files instead of 4.
+Although the results are indeedly interesting:
+
+__Time to DOMContentLoaded (1 CSS file)__
+
+| __Marks__ | __No-throttle__ | __Regular 2G__ |
+| --------- | --------------- | -------------- |
+| 1st       |           344ms |         3330ms |
+| 2nd       |           352ms |         3470ms |
+| 3rd       |           385ms |         3450ms |
+| 4th       |           372ms |         3410ms |
+| 5th       |           406ms |         3460ms |
+| _Average_ |         _372ms_ |       _3424ms_ |
+
+__Time to DOMContentLoaded (2 CSS files)__
+
+| __Marks__ | __No-throttle__ | __Regular 2G__ |
+| --------- | --------------- | -------------- |
+| 1st       |           397ms |         2440ms |
+| 2nd       |           459ms |         2430ms |
+| 3rd       |           472ms |         2440ms |
+| 4th       |           358ms |         2410ms |
+| 5th       |           418ms |         2430ms |
+| _Average_ |         _421ms_ |       _2430ms_ |
+
+As shown by the comparison, there is almost 1 second of difference in slow connections for the 2 CSS files pattern this could be due to parallel download made by Google Chrome, so _making requests and downloading CSS files in parallel seems to work better for slow connections_; __Recalculate Styles__ is called once both files are already downloaded and parsed.
+
+__Time to download CSS files (No-throttle)__
+
+| __Marks__ | __1 CSS__ | __2 CSS__ |
+| --------- | --------- | --------- |
+| 1st       |      21ms |      55ms |
+| 2nd       |      15ms |      30ms |
+| 3rd       |      17ms |      44ms |
+| 4th       |      17ms |      39ms |
+| 5th       |      13ms |      33ms |
+| _Average_ |    _17ms_ |    _40ms_ |
+
+__Time to download CSS files (Regular 2G)__
+
+| __Marks__ | __1 CSS__ | __2 CSS__ |
+| --------- | --------- | --------- |
+| 1st       |    1010ms |     677ms |
+| 2nd       |     996ms |     674ms |
+| 3rd       |    1010ms |     677ms |
+| 4th       |    1010ms |     678ms |
+| 5th       |    1000ms |     677ms |
+| _Average_ |  _1005ms_ |   _677ms_ |
+
+__IMPORTANT:__ The file has to be big enough to justify another request to the server. In this case the files are kept together into a single one. It's, in fact, such a chore to keep track of every single file and consider whether or not it's worth another request without using a module bundler such as __webpack__ for automation.
