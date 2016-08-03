@@ -4,6 +4,10 @@ This project is part of __Udacity's Front-end Nanodegree__ and is made based on 
 
 This file describes the optimizations made in order to achieve __60fps__ most of the time, and an acceptable loading time.
 
+For testing PageSpeed use [this](https://friasdesign.github.io/frontend-nanodegree-mobile-portfolio/dist) built page.
+
+For being able to see dist folder check __gh-pages__ branch.
+
 ## Overall Results
 
 The following results were taken from the final built project with minified files and assets.
