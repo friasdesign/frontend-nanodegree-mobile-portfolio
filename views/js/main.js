@@ -564,10 +564,6 @@ var Mover = (function MoverInstanciator(){
   };
 })();
 
-// CODE EXECUTED BEFORE DOMContentLoaded _______________________________________
-loadBackground();
-// --> END CODE EXECUTED BEFORE DOMContentLoaded _______________________________
-
 // CODE EXECUTED AFTER DOM CONTENT LOADED EVENT ________________________________
 document.addEventListener('DOMContentLoaded', function loaded() {
   var slider = document.getElementById('sizeSlider');
@@ -578,6 +574,8 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 
   // This calls the initial loading phase of pizzas in background
   pizzaMover.initialLoad();
+
+  loadPizzas();
 
   // Add the listener for changing pizza sizes.
   // resizePizzas(size) is called when the slider in the "Our Pizzas" section of the website moves.
@@ -604,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
 // --> END CODE EXECUTED AFTER DOM CONTENT LOADED  EVENT _______________________
 
 // HELPER FUNCTIONS ____________________________________________________________
-function loadBackground() {
+function loadPizzas() {
   window.performance.mark("mark_start_generating"); // collect timing data
 
   var pizzasDiv = document.getElementById("randomPizzas"),

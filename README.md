@@ -42,7 +42,36 @@ The following optimizations apply to these files: `index.html`, `project-2048.ht
 
 The following optimizations have been applied in order to optimize loading time:
 
+##### `script` tag positioning
+
+Originally script tag has been placed on the __bottom__ of the `<body>` element. Curiously, during timeline testing, the following has been seen:
+
+![sample-on-bottom](https://s31.postimg.org/5x0xzclbf/on_bottom.png)
+
+_Note: the other scripts running after main.js are used by browsersync (dev server tool) for livereloading._
+
+As can be seen on the image above, _Recalculate Styles_, _Layout_, and  _Paint_ are called twice, once before executing `main.js` and once after (because `main.js` modifies the DOM, triggering a rerendering process).
+It's also important to notice that Google Chrome gave `main.js` file a __medium__ download priority, although this file is crucial because it renders page content.
+
+Given the results, `script` tag calling `main.js` has been moved inside `<head>` element, showing the following:
+
+![sample-on-top](https://s31.postimg.org/46hwxv3sb/on_top.png)
+
+In this scenario, the script is executed rightaway, showing that this time chrome has only executed the last 3 steps of CRP (Critical Rendering Path) once, after `DOMContentLoaded` event has been triggered.
+Executing code inside `main.js` has been placed into a callback function for `DOMContentLoaded` listener, leaving the browser for simply defining functions and variables before the page is loaded and executing the actual code later.
+It's important to notice that this time Google CHrome has labeled `main.js` asset with __High Priority__.
+
+A loading time comparison between them doesn't show much of a difference, but this approach helped to reduce time to `DOMContentLoaded`:
+
+|     __Event__    | __Tag on bottom__ | __Tag on top__ |
+| ---------------- | ----------------- | -------------- |
+| DOMContentLoaded |             440ms |          395ms |
+| Load             |             737ms |          725ms |
+
+_Note: this test has been run with non-minified files and under development conditions, it was only meant to compare the effects of tag position on loading time_
+
 ##### pizzaElementGenerator (in `js/main.js`)
+
 This generator created DOM elements with randomly named pizzas, the fact that this function also assigned inline styles to each of the DOM nodes individually before appending made it run slowly, _optimization_ applied here was to default those styles in `style.css` instead and simply add the corresponding class to each node. Here are the results:
 
 | __Marks__ | __Vanilla__ | __Optimization__ |
