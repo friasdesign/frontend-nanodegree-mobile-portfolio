@@ -380,7 +380,7 @@ var pizzaElementGenerator = function(i) {
   pizzaContainer.classList.add("randomPizzaContainer");
   pizzaContainer.id = "pizza" + i;                // gives each pizza element a unique id
 
-  pizzaImage.src = "images/pizza.png";
+  pizzaImage.src = "images/misc/pizza.png";
   pizzaImage.classList.add("img-responsive");
   pizzaImageContainer.classList.add("randomPizzaContainer__image");
   pizzaImageContainer.appendChild(pizzaImage);
@@ -540,7 +540,7 @@ var Mover = (function MoverInstanciator(){
         for (var i = 0; i < 200; i++) {
           var elem = document.createElement('img');
           elem.className = 'mover';
-          elem.src = "images/pizza.png";
+          elem.src = "images/misc/pizza.png";
           elem.style.height = "100px";
           elem.style.width = "73.333px";
           elem.basicLeft = (i % cols) * s;
@@ -569,11 +569,7 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   var slider = document.getElementById('sizeSlider');
 
   // Listener resizePizzas has a closure on this instance/
-  var pizzaResizer = PizzaResizer.getInstance(),
-      pizzaMover = Mover.getInstance();
-
-  // This calls the initial loading phase of pizzas in background
-  pizzaMover.initialLoad();
+  var pizzaResizer = PizzaResizer.getInstance();
 
   loadPizzas();
 
@@ -600,6 +596,16 @@ document.addEventListener('DOMContentLoaded', function loaded() {
   });
 });
 // --> END CODE EXECUTED AFTER DOM CONTENT LOADED  EVENT _______________________
+
+// CODE EXECUTED AFTER LOAD EVENT ______________________________________________
+window.addEventListener('load', function windowLoad(){
+  var pizzaMover = Mover.getInstance();
+
+  // This calls the initial loading phase of pizzas in background
+  pizzaMover.initialLoad();
+});
+
+// --> END CODE EXECUTED AFTER LOAD EVENT ______________________________________
 
 // HELPER FUNCTIONS ____________________________________________________________
 function loadPizzas() {

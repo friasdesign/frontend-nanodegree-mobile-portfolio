@@ -42,6 +42,22 @@ The following optimizations apply to these files: `index.html`, `project-2048.ht
 
 The following optimizations have been applied in order to optimize loading time:
 
+##### Loading background after `window.onload` event
+
+Originally the code that loads pizzas in background was called before the code that generates the random pizzas delaying the display of content. These results where obtained:
+
+__Time to load event__
+
+| __Marks__ | __Vanilla__ | __Optimization__ |
+| --------- | ----------- | ---------------- |
+| 1st       |       787ms |            774ms |
+| 2nd       |       837ms |            689ms |
+| 3rd       |       803ms |            678ms |
+| 4th       |       757ms |            566ms |
+| 5th       |       887ms |            601ms |
+| _Average_ |     _814ms_ |          _662ms_ |
+
+
 ##### `script` tag positioning
 
 Originally script tag has been placed on the __bottom__ of the `<body>` element. Curiously, during timeline testing, the following has been seen:
