@@ -16,7 +16,8 @@ const gulp = require('gulp'),
 			pngquant = require('imagemin-pngquant'),
 			rename = require('gulp-rename'),
 			imageResize = require('gulp-image-resize'),
-			webp = require('gulp-webp');
+			webp = require('gulp-webp'),
+			inject = require('gulp-inject');
 
 // Demilitarized Object, it's a pattern used for passing a safe object as first
 // argument for bind, apply or call methods, for preventing possible global
@@ -63,7 +64,7 @@ gulp.task('compile-styles', [
 ]);
 
 // SERVER ______________________________________________________________________
-gulp.task('serve', ['compile-styles'],() => {
+gulp.task('serve', ['compile-styles', 'inject-assets'],() => {
 	browserSync.init({
 		server: './'
 	});
@@ -73,10 +74,51 @@ gulp.task('serve', ['compile-styles'],() => {
 	gulp.watch('./*.html').on('change', browserSync.reload);
 });
 
+// INJECT ASSETS _______________________________________________________________
+gulp.task('inject-assets--views', () => {
+	return gulp.src('./views/templates/pizza.html')
+		.pipe(inject(gulp.src(['./views/js/main.js']), {
+			starttag: '<!-- inject:{{ext}} -->',
+			transform: function (filePath, file) {
+				var content = file.contents.toString('utf8');
+				
+				return `<script type="text/javascript">\n${content}\n</script>`
+			}
+		}))
+		.pipe(inject(gulp.src(['./views/css/style.css']), {
+			starttag: '<!-- inject:{{ext}} -->',
+			transform: function (filePath, file) {
+				var content = file.contents.toString('utf8');
+				
+				return `<style>\n${content}\n</style>`
+			}
+		}))
+		.pipe(gulp.dest('./views'));
+});
+
+gulp.task('inject-assets', ['inject-assets--views'], () => {
+	return gulp.src('./templates/*.html')
+		.pipe(inject(gulp.src(['./css/style.css']), {
+			starttag: '<!-- inject:{{ext}} -->',
+			transform: function (filePath, file) {
+				var content = file.contents.toString('utf8');
+				
+				return `<style>\n${content}\n</style>`
+			}
+		}))
+		.pipe(gulp.dest('./'));
+});
+
+
 // MIN__HTML ___________________________________________________________________
 function minifyHTML(srcPath, destPath) {
 	return gulp.src(srcPath)
-		.pipe(htmlmin({collapseWhitespace: true}))
+		.pipe(htmlmin({
+			collapseWhitespace: true,
+			minifyCSS: true,
+			minifyJS: true,
+			removeComments: true
+		}))
 		.pipe(gulp.dest(destPath));
 }
 
@@ -275,6 +317,7 @@ gulp.task('min-img', [
 
 // BUILD _______________________________________________________________________
 gulp.task('build', [
+	'inject-assets',
 	'minify-css',
 	'minify-js',
 	'minify-html',
