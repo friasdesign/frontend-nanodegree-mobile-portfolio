@@ -275,9 +275,9 @@ gulp.task('min-img', [
 
 // BUILD _______________________________________________________________________
 gulp.task('build', [
+	'minify-css',
 	'minify-js',
 	'minify-html',
-	'minify-css',
 	'min-img'
 ]);
 

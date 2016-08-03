@@ -4,18 +4,50 @@ This project is part of __Udacity's Front-end Nanodegree__ and is made based on 
 
 This file describes the optimizations made in order to achieve __60fps__ most of the time, and an acceptable loading time.
 
+## Overall Comparison with Bundled Project (using Webpack)
+
+This comparison is made in order to check how much performant could be a bundled project, containing all critical files in just one big chunk. The current bundled version of this project is found in [this repository](somepage).
+
+### `views/pizza.html`
+
+|            __Marks__                    | __No-bundled__ | __Webpack__ |
+| --------------------------------------- | -------------- | ----------- |
+| Time to `DOMContentLoaded`              |          372ms |        ---- |
+| Time to `DOMContentLoaded` _(throttle)_ |         3424ms |        ---- |
+| Time to `load`                          |          375ms |        ---- |
+| Time to `load` _(throttle)_             |         3946ms |        ---- |
+| CRP length                              |              1 |        ---- |
+| CRP size                                |         31.1Kb |        ---- |
+| CRP No. resources                       |              3 |        ---- |
+
+### `/*.html`
+
+These metrics apply to all html files that are in root folder.
+
+|            __Marks__                    | __No-bundled__ | __Webpack__ |
+| --------------------------------------- | -------------- | ----------- |
+| Time to `DOMContentLoaded`              |           39ms |        ---- |
+| Time to `DOMContentLoaded` _(throttle)_ |          398ms |        ---- |
+| Time to `load`                          |          557ms |        ---- |
+| Time to `load` _(throttle)_             |         3946ms |        ---- |
+| CRP length                              |              2 |        ---- |
+| CRP size                                |         34.1Kb |        ---- |
+| CRP No. resources                       |              4 |        ---- |
+
+_Note: in /*.html webfonts are used, since the browser has to do 3 more requests for fetching the data needed for first print it has a significant effect in performance. Although it's important to notice that if the css file containing the webfonts is bundled together with style.css the fonts will only be downloaded in WOFF2 format making unacessible to browsers that doesn't support that format (such as iOS safari). Google Fonts server checks User-Agent in request header and sends back the right css containing links for fonts that are supported by it._
+
 ## Optimization
 
-### `./*.html`
+### `/*.html`
 
 The following optimizations apply to these files: `index.html`, `project-2048.html`, `project-mobile.html`, and `project-webperf.html`.
 
 #### Loading Time
 
-1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. __280ms__ to `load` with analytics inside `perfmatters.js`, __335ms__ to `load` with analytics *inline*.
+1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. __280ms__ to `load` with analytics inside `perfmatters.js`, __335ms__ to `load` with analytics _inline_.
 2. Shortening CSS selectors and removing unused/redundant styles from `style.css` made parse stylesheet time change from `2.25ms` to ~`3ms`, interesting because overall onload time has been down to ~800ms from 1600ms. This could be due to a decreased recalculate style time.
 
-### `./views/`
+### `/views/`
 
 #### Loading Time
 
@@ -33,6 +65,7 @@ This generator created DOM elements with randomly named pizzas, the fact that th
 | 5th       |        81ms |             63ms |
 | _Average_ |      _94ms_ |           _67ms_ |
 
+
 #### PizzaResize
 
 The following optimizations have been applied in order to improve pizza resizing time:
@@ -40,7 +73,7 @@ The following optimizations have been applied in order to improve pizza resizing
 ##### Singleton reengineering
 
 In vanilla, functions were defined inside the listener, so each time the user clicked the slider (`#sizeSlider`), JS redefined functions with the same code inside.
-In order to optimize this issue, I've used a *singleton pattern* to create an object which holds all functions used for resizing pizzas. This singleton, name `PizzaResizer`, is instanciated only once after `DOMContentLoaded` event, so those functions are available as methods inside `PizzaResizer`.
+In order to optimize this issue, a _singleton pattern_ have been used to create an object which holds all functions used for resizing pizzas. This singleton, named `PizzaResizer`, is instanciated only once after `DOMContentLoaded` event, so those functions are available as methods inside `PizzaResizer`.
 
 The following results were obtained:
 
@@ -55,16 +88,16 @@ The following results were obtained:
 
 
 #### Changing Classes
-The general main issue with PizzaResize is Forced Asynchronous Layout, in order to restore the *CRP* (Critical Rendering Path) sequential order I came up with the idea of adding the different sizes in classes and then simply toggling the classes as needed.
+The general main issue with PizzaResize is __Forced Asynchronous Layout__, in order to restore the _CRP_ (Critical Rendering Path) sequential order the styles former applied directly to the DOM node (via JS) are now grouped together in corresponding CSS classes, leaving JS for simply toggling classes as needed.
 
 The classes are:
- - `randomPizzaContainer--small`. Sets the `width` property to *25%*.
- - `randomPizzaContainer--large`. Sets the `width` property to *50%*.
- - `randomPizzaContainer`. __Default__.Sets the `width` property to *33.3%*.
+ - `randomPizzaContainer--small`. Sets the `width` property to _25%_.
+ - `randomPizzaContainer--large`. Sets the `width` property to _50%_.
+ - `randomPizzaContainer`. __Default__.Sets the `width` property to _33.3%_.
 
-In timeline the results show that JS code is executed first, once finished *CRP* order is followed, calling __Recalculate Styles__, then __Layout__, and __Paint__.
+In timeline the results show that JS code is executed first, once finished _CRP_ order is followed, calling __Recalculate Styles__, then __Layout__, and __Paint__.
 
-The results are astonishing, iterating over the *Singleton optimization*, the following are the results:
+The results are astonishing, iterating over the _Singleton optimization_, the following are the results:
 
 | __Marks__ | __Vanilla__ | __Singleton__ | __Class Optimization__ |
 | --------- | ----------- | ------------- | ---------------------- |
@@ -128,7 +161,7 @@ __Time to DOMContentLoaded (2 CSS files)__
 | 5th       |           418ms |         2430ms |
 | _Average_ |         _421ms_ |       _2430ms_ |
 
-As shown by the comparison, there is almost 1 second of difference in slow connections for the 2 CSS files pattern this could be due to parallel download made by Google Chrome, so _making requests and downloading CSS files in parallel seems to work better for slow connections_; __Recalculate Styles__ is called once both files are already downloaded and parsed.
+As shown above, there is almost 1 second of difference in slow connections for the 2 CSS files pattern this could be due to parallel download made by Google Chrome, so _making requests and downloading CSS files in parallel seems to work better for slow connections_; __Recalculate Styles__ is called once both files are already downloaded and parsed.
 
 __Time to download CSS files (No-throttle)__
 
