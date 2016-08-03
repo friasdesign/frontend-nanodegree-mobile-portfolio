@@ -4,35 +4,24 @@ This project is part of __Udacity's Front-end Nanodegree__ and is made based on 
 
 This file describes the optimizations made in order to achieve __60fps__ most of the time, and an acceptable loading time.
 
-## Overall Comparison with Bundled Project (using Webpack)
+## Overall Results
 
-This comparison is made in order to check how much performant could be a bundled project, containing all critical files in just one big chunk. The current bundled version of this project is found in [this repository](somepage).
+The following results were taken from the final built project with minified files and assets.
 
-### `views/pizza.html`
+`/*.html` in the following sections refers to all html files in root directory as opposed to html files inside views.
 
-|            __Marks__                    | __No-bundled__ | __Webpack__ |
-| --------------------------------------- | -------------- | ----------- |
-| Time to `DOMContentLoaded`              |          372ms |        ---- |
-| Time to `DOMContentLoaded` _(throttle)_ |         3424ms |        ---- |
-| Time to `load`                          |          375ms |        ---- |
-| Time to `load` _(throttle)_             |         3946ms |        ---- |
-| CRP length                              |              1 |        ---- |
-| CRP size                                |         31.1Kb |        ---- |
-| CRP No. resources                       |              3 |        ---- |
 
-### `/*.html`
+|            __Marks__                     | `/views/pizza.html` | `/*.html` |
+| ---------------------------------------- | ------------------- | --------- |
+| Time to `DOMContentLoaded`               |               372ms |      39ms |
+| Time to `DOMContentLoaded` _(throttle)_* |              3424ms |     398ms |
+| Time to `load`                           |               375ms |     557ms |
+| Time to `load` _(throttle)_*             |              3946ms |    3946ms |
+| CRP length                               |                   1 |         2 |
+| CRP size                                 |              31.1Kb |    34.1Kb |
+| CRP No. resources                        |                   3 |         4 |
 
-These metrics apply to all html files that are in root folder.
-
-|            __Marks__                    | __No-bundled__ | __Webpack__ |
-| --------------------------------------- | -------------- | ----------- |
-| Time to `DOMContentLoaded`              |           39ms |        ---- |
-| Time to `DOMContentLoaded` _(throttle)_ |          398ms |        ---- |
-| Time to `load`                          |          557ms |        ---- |
-| Time to `load` _(throttle)_             |         3946ms |        ---- |
-| CRP length                              |              2 |        ---- |
-| CRP size                                |         34.1Kb |        ---- |
-| CRP No. resources                       |              4 |        ---- |
+_* Note: throttled at Regular 2G chrome networking throttling setting._
 
 _Note: in /*.html webfonts are used, since the browser has to do 3 more requests for fetching the data needed for first print it has a significant effect in performance. Although it's important to notice that if the css file containing the webfonts is bundled together with style.css the fonts will only be downloaded in WOFF2 format making unacessible to browsers that doesn't support that format (such as iOS safari). Google Fonts server checks User-Agent in request header and sends back the right css containing links for fonts that are supported by it._
 
