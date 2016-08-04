@@ -8,6 +8,32 @@ For testing PageSpeed use [this](https://friasdesign.github.io/frontend-nanodegr
 
 For being able to see dist folder check __gh-pages__ branch.
 
+## Getting started
+
+Clone this repository on your computer:
+
+```
+git clone https://github.com/friasdesign/frontend-nanodegree-mobile-portfolio.git .
+```
+
+Run npm on the root folder of the project (it requires __node.js__. If you don't have it go [here](https://nodejs.org/en/)):
+
+```
+npm i
+```
+
+For compiling templates, styles and run dev-server use:
+
+```
+gulp serve
+```
+
+For building the app for production:
+
+```
+gulp build
+```
+
 # Contents
 
 - [Overall Results](#overall-results)
@@ -27,6 +53,7 @@ For being able to see dist folder check __gh-pages__ branch.
             - [Singleton Pattern](#singleton-pattern)
             - [Animation Frame and Batching](#animation-frame-and-batching)
         * [A single CSS file](#a-single-css-file)
+- [License](#license)
 
 ## Overall Results
 
@@ -257,3 +284,7 @@ __Time to download CSS files (Regular 2G)__
 | _Average_ |  _1005ms_ |   _677ms_ |
 
 __IMPORTANT:__ The file has to be big enough to justify another request to the server. In this case the files are kept together into a single one. It's, in fact, such a chore to keep track of every single file and consider whether or not it's worth another request without using a module bundler such as __webpack__ for automation.
+
+## License
+
+This project is under [MIT License](LICENSE.md).
