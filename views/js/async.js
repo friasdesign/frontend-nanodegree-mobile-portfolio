@@ -12,7 +12,7 @@ var PizzaResizer = (function PizzaResizerInstanciator() {
 
   function PizzaResizer() {
     // Private props and methods
-    var randomPizzas = document.querySelector('#randomPizzas');
+    var randomPizzas = document.getElementById('randomPizzas');
     
     // Changes the slider value to a percent width
     function sizeSwitcher (size) {
@@ -46,7 +46,7 @@ var PizzaResizer = (function PizzaResizerInstanciator() {
 
     // Changes the value for the size of the pizza above the slider
     function changeSliderLabel(size) {
-      var slider = document.querySelector("#pizzaSize");
+      var slider = document.getElementById("pizzaSize");
       switch(size) {
         case "1":
           slider.innerHTML = "Small";
@@ -65,7 +65,7 @@ var PizzaResizer = (function PizzaResizerInstanciator() {
     return {
       // Iterates through pizza elements on the page and changes their widths
       changePizzaSizes: function (size) {
-        var randomContainers = document.querySelectorAll('.randomPizzaContainer'),
+        var randomContainers = document.getElementsByClassName('randomPizzaContainer'),
             changingFunction = sizeSwitcher(size);
         changeSliderLabel(size);
 
