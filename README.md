@@ -4,9 +4,29 @@ This project is part of __Udacity's Front-end Nanodegree__ and is made based on 
 
 This file describes the optimizations made in order to achieve __60fps__ most of the time, and an acceptable loading time.
 
-For testing PageSpeed use [this](https://friasdesign.github.io/frontend-nanodegree-mobile-portfolio/dist) built page.
+For testing PageSpeed use [this](https://friasdesign.github.io/frontend-nanodegree-mobile-portfolio/dist/index.html) built page.
 
 For being able to see dist folder check __gh-pages__ branch.
+
+# Contents
+
+- [Overall Results](#overall-results)
+- [Optimization](#optimization)
+    + [`/*.html`](#html)
+        * [Web Fonts](#web-fonts)
+        * [Loading Time](#loading-time-1)
+    + [`/views/`](#views)
+        * [Loading Time](#loading-time-2)
+            - [Loading background after `window.onload` event](#loading-background-after-windowonload-event)
+            - [`script` tag positioning](#script-tag-positioning)
+            - [pizzaElementGenerator](#pizzaelementeenerator)
+        * [PizzaResize](#pizzaresize)
+            - [Singleton reengineering](#singleton-reengineering)
+            - [Changing Classes](#changing-classes)
+        * [Scrolling](#scrolling)
+            - [Singleton Pattern](#singleton-pattern)
+            - [Animation Frame and Batching](#animation-frame-and-batching)
+        * [A single CSS file](#a-single-css-file)
 
 ## Overall Results
 
@@ -103,9 +123,9 @@ A loading time comparison between them doesn't show much of a difference, but th
 
 _Note: this test has been run with non-minified files and under development conditions, it was only meant to compare the effects of tag position on loading time_
 
-##### pizzaElementGenerator (in `js/main.js`)
+##### pizzaElementGenerator
 
-This generator created DOM elements with randomly named pizzas, the fact that this function also assigned inline styles to each of the DOM nodes individually before appending made it run slowly, _optimization_ applied here was to default those styles in `style.css` instead and simply add the corresponding class to each node. Here are the results:
+`pizzaElementGenerator` (in `js/main.js`) created DOM elements with randomly named pizzas, the fact that this function also assigned inline styles to each of the DOM nodes individually before appending made it run slowly, _optimization_ applied here was to default those styles in `style.css` instead and simply add the corresponding class to each node. Here are the results:
 
 | __Marks__ | __Vanilla__ | __Optimization__ |
 | --------- | ----------- | ---------------- |
@@ -138,7 +158,7 @@ The following results were obtained:
 | _Average_ |     _379ms_ |          _303ms_ |
 
 
-#### Changing Classes
+##### Changing Classes
 The general main issue with PizzaResize is __Forced Asynchronous Layout__, in order to restore the _CRP_ (Critical Rendering Path) sequential order the styles former applied directly to the DOM node (via JS) are now grouped together in corresponding CSS classes, leaving JS for simply toggling classes as needed.
 
 The classes are:
@@ -159,14 +179,14 @@ The results are astonishing, iterating over the _Singleton optimization_, the fo
 | 5th       |       424ms |         325ms |                    4ms |
 | _Average_ |     _379ms_ |       _303ms_ |                  _4ms_ |
 
-### Scrolling
+#### Scrolling
 
 The main issue during scrolling is the recalculation of the position of pizzas in the background, these are optimizations that took place in order to reach better performance.
 
-#### Singleton Pattern
+##### Singleton Pattern
 A singleton, named `Mover`, has been created for wrapping all methods related. __No significant improve__ in performance have been seen using this pattern, but code is now __modularized__ with a __cleaner global__ scope.
 
-#### Animation Frame and Batching
+##### Animation Frame and Batching
 
 Analyzing the Timeline, FSL(Forced Synchronous Layout) has been seen whenever `updatePositions` method was executed. The following measures has been taken for overcoming this issue:
 1. Execute `updatePositions` method first in a frame, using `requestAnimationFrame()`. This allows JS code to reach calculated __layout__ from previous frame.
@@ -185,7 +205,7 @@ This optimization shown the following results:
 
 Used [this](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing#avoid-forced-synchronous-layouts) link as reference.
 
-### A single CSS file
+#### A single CSS file
 
 The original `bootstrap-grid.css` file containing bootstrap grid system has been transformed into a __SASS partial__ named `_grid.scss` this partial is required inside the main `style.scss` to be added when __SASS pre-compiler__ runs, this way CRP Number of critical resources is shortened to 3 files instead of 4.
 Although the results are indeedly interesting:
