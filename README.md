@@ -35,6 +35,19 @@ _Note: in /*.html webfonts are used, since the browser has to do 3 more requests
 
 The following optimizations apply to these files: `index.html`, `project-2048.html`, `project-mobile.html`, and `project-webperf.html`.
 
+#### Web Fonts
+
+Web Fonts have an important impact in performance, but it is important to consider that web fonts are crucial for accessibility (e.g. language support) and good design, they are also preferred over images with rasterized text.
+
+| __Marks__ | __With__ | __Without__ |
+| --------- | -------- | ----------- |
+| 1st       |    807ms |       600ms |
+| 2nd       |    893ms |       662ms |
+| 3rd       |    819ms |       741ms |
+| _Average_ |  _840ms_ |     _668ms_ |
+
+In this case the font has been removed, since there is no way to achieve 90 points at PageSpeed test for mobile with Web Fonts added.
+
 #### Loading Time
 
 1. Placing Google Analytics logic code inside `perfmatters.js` and loading it `async` allows `load` event to be triggered faster. __280ms__ to `load` with analytics inside `perfmatters.js`, __335ms__ to `load` with analytics _inline_.
