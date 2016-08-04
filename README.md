@@ -44,6 +44,7 @@ gulp build
     + [`/views/`](#views)
         * [Loading Time](#loading-time-2)
             - [Loading background after `window.onload` event](#loading-background-after-windowonload-event)
+            - [Number of Pizzas in Background](#Number of Pizzas in Background)
             - [`script` tag positioning](#script-tag-positioning)
             - [pizzaElementGenerator](#pizzaelementeenerator)
         * [PizzaResize](#pizzaresize)
@@ -121,6 +122,10 @@ __Time to load event__
 | 5th       |       887ms |            601ms |
 | _Average_ |     _814ms_ |          _662ms_ |
 
+##### Number of Pizzas in Background
+
+Originally the number of pizzas was fixed to 200, although most of the time is not necessary to have such a big number to fill the screen, so a calculation based on `window.screen.height` and the number of rows was made instead.
+Although no significant improvement has been seen regarding generation time (only a gain of a few milliseconds), this approach improved the speed of scrolling, since there's fewer nodes to be modified each scroll time.
 
 ##### `script` tag positioning
 
