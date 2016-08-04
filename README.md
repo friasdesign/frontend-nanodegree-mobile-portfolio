@@ -44,7 +44,7 @@ gulp build
     + [`/views/`](#views)
         * [Loading Time](#loading-time-2)
             - [Loading background after `window.onload` event](#loading-background-after-windowonload-event)
-            - [Number of Pizzas in Background](#Number of Pizzas in Background)
+            - [Number of Pizzas in Background](#number-of-pizzas-in-background)
             - [`script` tag positioning](#script-tag-positioning)
             - [pizzaElementGenerator](#pizzaelementeenerator)
         * [PizzaResize](#pizzaresize)
